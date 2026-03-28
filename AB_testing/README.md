@@ -1,104 +1,137 @@
-# Sales Forecasting for a Retail Store
+# A/B Test Analysis: Website Feature Impact on Conversion Rate
 
-## Project Overview
-This project focuses on forecasting monthly retail sales using time series analysis. The goal is to identify patterns such as trend and seasonality in historical sales data and build a forecasting model to predict future sales. Accurate sales forecasting helps businesses improve inventory planning, marketing strategies, and financial decision-making.
+## Overview
+A complete end-to-end A/B test analysis determining whether a new website 
+feature significantly improved user conversion rates. The project covers 
+data generation, cleaning, statistical testing, segmentation, and 
+visualization.
 
-The analysis was conducted using Python and statistical modeling techniques, with the final model generating a **6-month sales forecast**.
+---
+
+## Business Question
+> Did the new website feature meaningfully increase the conversion rate 
+> compared to the existing version?
+
+---
 
 ## Dataset
-The dataset contains **48 months of simulated monthly retail sales data (January 2020 – December 2023).**
+| Property | Value |
+|---|---|
+| Source | Synthetically generated (realistic mock data) |
+| Total Users | 10,000 |
+| Users per Group | 5,000 |
+| Test Duration | 14 days (Nov 1–14, 2023) |
+| Groups | Control (A) vs Treatment (B) |
+| Key Metric | Conversion Rate |
+| Secondary Metrics | Click-through Rate, Page Views |
 
-### Features
-- **SalesAmount** – Monthly retail sales  
-- **Promotion** – Binary indicator showing whether a promotion occurred  
-- **HolidayMonth** – Binary indicator for holiday periods  
-
-The dataset does not contain missing values and shows clear seasonal patterns across the years.
-
-
-## Objectives
-- Explore historical retail sales data  
-- Identify trends and seasonal patterns  
-- Perform stationarity and autocorrelation analysis  
-- Build a forecasting model using **SARIMA**  
-- Generate a **6-month sales forecast**
-  
-
-## Tools & Technologies
-The project was implemented using the Python data science ecosystem:
-
-- **Python**
-- **Pandas**
-- **NumPy**
-- **Matplotlib**
-- **Statsmodels**
-- **Scikit-learn**
+---
 
 ## Methodology
 
-### Exploratory Data Analysis (EDA)
-Initial analysis was performed to understand the structure and behaviour of the data. Visualizations were used to identify long-term trends and seasonal fluctuations in sales.
+### 1. Data Generation & Cleaning
+- Generated 10,000 synthetic users split evenly into Control and Treatment
+- Validated no duplicate users, no cross-group contamination, and no 
+  missing values
+- Confirmed data integrity (clicks never exceeded page views)
 
-### Seasonal Decomposition
-The time series was decomposed into three components:
+### 2. Key Metrics Calculated
+- **Conversion Rate** = Conversions / Total Users (primary metric)
+- **Click-through Rate** = Clicks / Page Views (secondary metric)
+- **Absolute Lift** = Treatment Rate − Control Rate
+- **Relative Lift** = Absolute Lift / Control Rate
 
-- **Trend**
-- **Seasonal pattern**
-- **Residual noise**
+### 3. Statistical Test
+- **Test used:** One-tailed Z-test for proportions
+- **Why Z-test:** Binary outcome (converted/not), large sample size 
+  (n=5,000 per group), normal approximation valid
+- **Significance level:** α = 0.05
+- **Hypothesis:**
+  - H₀: Treatment conversion rate ≤ Control conversion rate
+  - H₁: Treatment conversion rate > Control conversion rate
 
-This helped confirm the presence of strong annual seasonality in the dataset.
+### 4. Practical Significance
+- Defined Minimum Detectable Effect (MDE) = 1.0% absolute lift
+- Compared observed lift against MDE threshold
+- Calculated Cohen's h effect size and achieved statistical power
 
-### Stationarity Testing
-An **Augmented Dickey-Fuller (ADF) test** was used to evaluate stationarity. The test results indicated that the series was stationary, allowing the model to proceed without additional non-seasonal differencing.
+### 5. Segmentation
+- Segmented users by engagement level (Low / Medium / High page views)
+- Analyzed daily conversion trends across the test period
 
-### Model Selection
-Based on **ACF and PACF analysis**, the following model was selected:
+---
 
-**SARIMA(1,0,1)(1,1,1)[12]**
+## Key Results
 
-This model captures both short-term dependencies and yearly seasonal patterns.
+| Metric | Control | Treatment |
+|---|---|---|
+| Users | 5,000 | 5,000 |
+| Conversions | 479 | 590 |
+| Conversion Rate | 9.58% | 11.80% |
+| 95% CI | (8.76%, 10.40%) | (10.91%, 12.69%) |
 
-### Model Evaluation
-The dataset was split into **training and test sets** to evaluate forecasting performance.
+| Statistical Metric | Value |
+|---|---|
+| Absolute Lift | +2.22% |
+| Relative Lift | +23.17% |
+| Z-statistic | 3.5924 |
+| P-value | 0.0002 |
+| Cohen's h | 0.0719 (Small) |
+| Achieved Power | 97.45% |
+| Statistically Significant | ✅ Yes |
+| Practically Significant | ✅ Yes (exceeds 1% MDE) |
 
-Evaluation metrics included:
+---
 
-- **MAE (Mean Absolute Error)**
-- **RMSE (Root Mean Squared Error)**
-- **MAPE (Mean Absolute Percentage Error)**
+## Visualizations
 
-The model achieved a **MAPE of approximately 10%**, indicating reasonably accurate forecasts for monthly retail sales.
+| Plot | Description |
+|---|---|
+| Plot 1 | Conversion rate bar chart with 95% CI error bars |
+| Plot 2 | Confidence interval overlap chart |
+| Plot 3 | Daily conversion rate trend over test period |
+| Plot 4 | Conversion rate by user engagement segment |
+| Plot 5 | Full summary dashboard |
 
+---
 
-## Forecast Results
-The trained SARIMA model was used to generate a **6-month forecast (January 2024 – June 2024).**
+## Recommendations
+1. **Ship the feature** — both statistical and practical significance 
+   thresholds are met with high confidence
+2. **Monitor post-launch** — track conversion rates for 2 weeks after 
+   full rollout to detect any novelty effect decay
+3. **Target high-engagement users first** — segmentation reveals stronger 
+   lift in high page-view users
+4. **Future experiments** — for detecting smaller lifts (<1%), increase 
+   sample size to ~11,200 users per group
 
-| Month | Forecast Sales |
-|------|------|
-| Jan 2024 | 16,093 |
-| Feb 2024 | 13,785 |
-| Mar 2024 | 13,478 |
-| Apr 2024 | 11,875 |
-| May 2024 | 11,385 |
-| Jun 2024 | 8,810 |
+---
 
-The forecast reflects a **seasonal decline from the beginning of the year toward mid-year**, consistent with historical sales patterns.
+## Tech Stack
+- **Python 3.x**
+- `pandas` — data manipulation
+- `numpy` — numerical computation
+- `scipy` / `statsmodels` — statistical testing & power analysis
+- `matplotlib` — visualizations
 
+---
 
-## Key Insights
-- Retail sales show a **consistent upward trend over time**
-- There is **strong annual seasonality**, especially during holiday periods
-- **Promotional months significantly increase sales**
-- The SARIMA model effectively captures both **trend and seasonal behaviour**
+## How to Run
+```bash
+# Install dependencies
+pip install pandas numpy statsmodels matplotlib
 
+# Run the full analysis
+python ab_test_analysis.py
+```
 
-## Future Improvements
-Possible improvements to the model include:
+---
 
-- Using **SARIMAX** to incorporate promotion and holiday variables as external features  
-- Expanding the dataset with **more years of sales data**  
-- Comparing results with other forecasting models such as **Prophet or LSTM**
-
-
-## Author
-**Maryam Fatima**  
+## Skills Demonstrated
+- Experimental design & hypothesis formulation
+- Statistical hypothesis testing (Z-test for proportions)
+- Confidence interval construction
+- Effect size & power analysis
+- Data segmentation & cohort analysis
+- Data visualization & dashboard design
+- Business-oriented interpretation of statistical results
